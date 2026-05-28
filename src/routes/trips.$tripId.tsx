@@ -1,8 +1,21 @@
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
-import { ArrowLeft, Calendar, MapPin, Briefcase, Palmtree } from "lucide-react";
+import {
+  ArrowLeft,
+  Calendar,
+  MapPin,
+  Briefcase,
+  Palmtree,
+  ExternalLink,
+  Car,
+  TrainFront,
+  TramFront,
+  Navigation,
+  Compass,
+} from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useTrips } from "@/lib/trips-store";
+import { getQuickLinks, getGettingAround, type TransportOption } from "@/lib/trip-helpers";
 
 export const Route = createFileRoute("/trips/$tripId")({
   head: () => ({
@@ -41,6 +54,7 @@ function TripDetail() {
   const completed = trip.checklist.filter((i) => i.done).length;
   const total = trip.checklist.length;
   const pct = total ? Math.round((completed / total) * 100) : 0;
+  const gettingAround = getGettingAround(trip);
 
   return (
     <div className="min-h-screen bg-background">
@@ -104,25 +118,89 @@ function TripDetail() {
           </div>
           <ul className="space-y-2">
             {trip.checklist.map((item) => (
-              <li key={item.id}>
-                <label className="flex cursor-pointer items-center gap-3 rounded-2xl border border-border/70 px-4 py-3 transition-colors hover:bg-secondary/50">
-                  <Checkbox
-                    checked={item.done}
-                    onCheckedChange={() => toggleChecklistItem(trip.id, item.id)}
-                  />
-                  <span
-                    className={`font-medium ${
-                      item.done ? "text-muted-foreground line-through" : "text-foreground"
-                    }`}
-                  >
-                    {item.label}
-                  </span>
-                </label>
-              </li>
-            ))}
+            {trip.checklist.map((item) => {
+              const quickLinks = getQuickLinks(item.label);
+              return (
+                <li
+                  key={item.id}
+                  className="rounded-2xl border border-border/70 px-4 py-3 transition-colors hover:bg-secondary/50"
+                >
+                  <div className="flex flex-wrap items-center gap-3">
+                    <label className="flex flex-1 cursor-pointer items-center gap-3">
+                      <Checkbox
+                        checked={item.done}
+                        onCheckedChange={() => toggleChecklistItem(trip.id, item.id)}
+                      />
+                      <span
+                        className={`font-medium ${
+                          item.done ? "text-muted-foreground line-through" : "text-foreground"
+                        }`}
+                      >
+                        {item.label}
+                      </span>
+                    </label>
+                    {quickLinks.length > 0 && (
+                      <div className="flex flex-wrap gap-2">
+                        {quickLinks.map((link) => (
+                          <a
+                            key={link.label}
+                            href={link.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 rounded-full bg-secondary px-3 py-1 text-xs font-semibold text-secondary-foreground transition-colors hover:bg-primary hover:text-primary-foreground"
+                          >
+                            {link.label}
+                            <ExternalLink className="h-3 w-3" />
+                          </a>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </li>
+              );
+            })}
           </ul>
         </section>
+
+        <section className="mt-6 rounded-3xl bg-card p-5 shadow-[var(--shadow-soft)] sm:p-6">
+          <div className="mb-1 flex items-center gap-2">
+            <Compass className="h-5 w-5 text-primary" />
+            <h2 className="text-xl font-extrabold text-foreground">Getting Around</h2>
+          </div>
+          <p className="mb-5 flex items-center gap-1.5 text-sm text-muted-foreground">
+            <Navigation className="h-3.5 w-3.5" />
+            ~{gettingAround.distanceKm.toLocaleString()} km away ·{" "}
+            {gettingAround.nearby ? "Nearby city" : "Long-distance / domestic"} — here's how to
+            move around:
+          </p>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            {gettingAround.options.map((opt) => (
+              <TransportCard key={opt.name} option={opt} />
+            ))}
+          </div>
+        </section>
       </main>
+    </div>
+  );
+}
+
+function TransportCard({ option }: { option: TransportOption }) {
+  const iconMap = {
+    uber: Car,
+    subway: TramFront,
+    car: Car,
+    train: TrainFront,
+  } as const;
+  const Icon = iconMap[option.icon];
+  return (
+    <div className="flex items-center gap-3 rounded-2xl border border-border/70 p-4">
+      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+        <Icon className="h-5 w-5" />
+      </span>
+      <div>
+        <p className="font-bold text-foreground">{option.name}</p>
+        <p className="text-sm text-muted-foreground">{option.description}</p>
+      </div>
     </div>
   );
 }
