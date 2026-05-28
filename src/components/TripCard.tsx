@@ -1,10 +1,15 @@
+import { Link } from "@tanstack/react-router";
 import type { Trip } from "@/lib/trips-data";
 import { Calendar } from "lucide-react";
 
 export function TripCard({ trip }: { trip: Trip }) {
   const isLeisure = trip.type === "Leisure";
   return (
-    <article className="group overflow-hidden rounded-3xl bg-card shadow-[var(--shadow-soft)] transition-transform duration-300 hover:-translate-y-1.5">
+    <Link
+      to="/trips/$tripId"
+      params={{ tripId: trip.id }}
+      className="group block overflow-hidden rounded-3xl bg-card shadow-[var(--shadow-soft)] transition-transform duration-300 hover:-translate-y-1.5"
+    >
       <div className="relative aspect-[4/3] overflow-hidden">
         <img
           src={trip.image}
@@ -29,6 +34,6 @@ export function TripCard({ trip }: { trip: Trip }) {
           {trip.dates}
         </p>
       </div>
-    </article>
+    </Link>
   );
 }
