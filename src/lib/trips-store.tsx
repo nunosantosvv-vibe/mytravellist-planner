@@ -35,12 +35,15 @@ interface TripsContextValue {
 const TripsContext = createContext<TripsContextValue | null>(null);
 
 export function TripsProvider({ children }: { children: ReactNode }) {
-  const [created, setCreated] = useState<Trip[]>([]);
+  const [trips, setTrips] = useState<Trip[]>(() => [...upcomingTrips, ...pastTrips]);
 
   useEffect(() => {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) setCreated(JSON.parse(raw) as Trip[]);
+      if (raw) {
+        const stored = JSON.parse(raw) as Trip[];
+        if (Array.isArray(stored) && stored.length > 0) setTrips(stored);
+      }
     } catch {
       /* ignore */
     }
@@ -48,20 +51,17 @@ export function TripsProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(created));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(trips));
     } catch {
       /* ignore */
     }
-  }, [created]);
+  }, [trips]);
 
-  const value = useMemo<TripsContextValue>(() => {
-    const upcoming = [...created, ...upcomingTrips];
-    const all = [...created, ...upcomingTrips, ...pastTrips];
-
-    return {
-      upcoming,
-      past: pastTrips,
-      getTrip: (id) => all.find((t) => t.id === id) ?? created.find((t) => t.id === id),
+  const value = useMemo<TripsContextValue>(
+    () => ({
+      upcoming: trips.filter((t) => t.category === "upcoming"),
+      past: trips.filter((t) => t.category === "past"),
+      getTrip: (id) => trips.find((t) => t.id === id),
       addTrip: (input) => {
         const trip: Trip = {
           id: `trip-${Date.now()}`,
@@ -70,13 +70,14 @@ export function TripsProvider({ children }: { children: ReactNode }) {
           type: input.type,
           workAddress: input.type === "Business" ? input.workAddress : undefined,
           image: fallbackImages[Math.floor(Math.random() * fallbackImages.length)],
+          category: "upcoming",
           checklist: buildChecklist(input.type),
         };
-        setCreated((prev) => [trip, ...prev]);
+        setTrips((prev) => [trip, ...prev]);
         return trip;
       },
       toggleChecklistItem: (tripId, itemId) => {
-        setCreated((prev) =>
+        setTrips((prev) =>
           prev.map((t) =>
             t.id === tripId
               ? {
@@ -89,8 +90,9 @@ export function TripsProvider({ children }: { children: ReactNode }) {
           ),
         );
       },
-    };
-  }, [created]);
+    }),
+    [trips],
+  );
 
   return <TripsContext.Provider value={value}>{children}</TripsContext.Provider>;
 }
