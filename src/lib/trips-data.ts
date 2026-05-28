@@ -25,6 +25,8 @@ export interface Trip {
 }
 
 const LEISURE_TASKS = [
+  "Book flights",
+  "Reserve accommodation",
   "Research local sights",
   "Pack swimwear",
   "Book restaurant reservations",
@@ -33,6 +35,8 @@ const LEISURE_TASKS = [
 ];
 
 const BUSINESS_TASKS = [
+  "Book flights",
+  "Reserve accommodation",
   "Print boarding pass",
   "Confirm meeting location",
   "Pack business attire",
