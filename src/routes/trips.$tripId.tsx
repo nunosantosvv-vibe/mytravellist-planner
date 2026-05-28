@@ -117,7 +117,6 @@ function TripDetail() {
             />
           </div>
           <ul className="space-y-2">
-            {trip.checklist.map((item) => (
             {trip.checklist.map((item) => {
               const quickLinks = getQuickLinks(item.label);
               return (
