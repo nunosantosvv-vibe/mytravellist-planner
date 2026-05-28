@@ -21,6 +21,7 @@ export interface Trip {
   image: string;
   workAddress?: string;
   checklist: ChecklistItem[];
+  category: "upcoming" | "past";
 }
 
 const LEISURE_TASKS = [
