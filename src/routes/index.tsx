@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Navbar } from "@/components/Navbar";
-import { NewTripButton } from "@/components/NewTripButton";
+import { NewTripDialog } from "@/components/NewTripDialog";
 import { UpcomingCarousel } from "@/components/UpcomingCarousel";
 import { PastAdventuresGrid } from "@/components/PastAdventuresGrid";
 
@@ -29,7 +29,7 @@ function Index() {
             Plan, organize, and share your adventures — all in one place.
           </p>
           <div className="mt-6 flex justify-center">
-            <NewTripButton />
+            <NewTripDialog />
           </div>
         </section>
         <UpcomingCarousel />
