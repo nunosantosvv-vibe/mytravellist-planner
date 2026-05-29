@@ -14,6 +14,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useTrips } from "@/lib/trips-store";
 import type { TripType } from "@/lib/trips-data";
+import { PlaceAutocomplete, type PlaceSelection } from "@/components/PlaceAutocomplete";
 
 export function NewTripDialog() {
   const navigate = useNavigate();
@@ -23,12 +24,16 @@ export function NewTripDialog() {
   const [dates, setDates] = useState("");
   const [type, setType] = useState<TripType>("Leisure");
   const [workAddress, setWorkAddress] = useState("");
+  const [destinationPlace, setDestinationPlace] = useState<PlaceSelection | null>(null);
+  const [workPlace, setWorkPlace] = useState<PlaceSelection | null>(null);
 
   const reset = () => {
     setDestination("");
     setDates("");
     setType("Leisure");
     setWorkAddress("");
+    setDestinationPlace(null);
+    setWorkPlace(null);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -39,6 +44,10 @@ export function NewTripDialog() {
       dates: dates.trim(),
       type,
       workAddress: workAddress.trim() || undefined,
+      placeId: destinationPlace?.placeId,
+      location: destinationPlace?.location,
+      workPlaceId: workPlace?.placeId,
+      workLocation: workPlace?.location,
     });
     setOpen(false);
     reset();
@@ -75,11 +84,21 @@ export function NewTripDialog() {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-1.5">
             <Label htmlFor="destination">Destination</Label>
-            <Input
+            <PlaceAutocomplete
               id="destination"
-              placeholder="e.g. Lisbon, Portugal"
+              placeholder="Search a city or place…"
               value={destination}
-              onChange={(e) => setDestination(e.target.value)}
+              onChange={(v) => {
+                setDestination(v);
+                if (destinationPlace && v !== destinationPlace.description) {
+                  setDestinationPlace(null);
+                }
+              }}
+              onSelect={(p) => {
+                setDestination(p.description);
+                setDestinationPlace(p);
+              }}
+              types={type === "Leisure" ? ["(cities)"] : undefined}
               required
             />
           </div>
@@ -120,11 +139,18 @@ export function NewTripDialog() {
           {type === "Business" && (
             <div className="space-y-1.5">
               <Label htmlFor="workAddress">Work address</Label>
-              <Input
+              <PlaceAutocomplete
                 id="workAddress"
-                placeholder="e.g. 123 Market St, San Francisco"
+                placeholder="Search the office address…"
                 value={workAddress}
-                onChange={(e) => setWorkAddress(e.target.value)}
+                onChange={(v) => {
+                  setWorkAddress(v);
+                  if (workPlace && v !== workPlace.description) setWorkPlace(null);
+                }}
+                onSelect={(p) => {
+                  setWorkAddress(p.description);
+                  setWorkPlace(p);
+                }}
               />
             </div>
           )}
