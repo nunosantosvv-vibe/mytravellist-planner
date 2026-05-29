@@ -1,3 +1,4 @@
+/// <reference types="google.maps" />
 import { useEffect, useId, useRef, useState } from "react";
 import { MapPin, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
