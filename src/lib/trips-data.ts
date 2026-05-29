@@ -20,6 +20,10 @@ export interface Trip {
   type: TripType;
   image: string;
   workAddress?: string;
+  placeId?: string;
+  location?: { lat: number; lng: number };
+  workPlaceId?: string;
+  workLocation?: { lat: number; lng: number };
   checklist: ChecklistItem[];
   category: "upcoming" | "past";
 }
