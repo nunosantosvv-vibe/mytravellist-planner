@@ -98,7 +98,6 @@ export function NewTripDialog() {
                 setDestination(p.description);
                 setDestinationPlace(p);
               }}
-              types={type === "Leisure" ? ["(cities)"] : undefined}
               required
             />
           </div>
