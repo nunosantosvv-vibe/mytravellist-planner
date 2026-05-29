@@ -22,6 +22,10 @@ interface NewTripInput {
   dates: string;
   type: TripType;
   workAddress?: string;
+  placeId?: string;
+  location?: { lat: number; lng: number };
+  workPlaceId?: string;
+  workLocation?: { lat: number; lng: number };
 }
 
 interface TripsContextValue {
@@ -69,6 +73,10 @@ export function TripsProvider({ children }: { children: ReactNode }) {
           dates: input.dates,
           type: input.type,
           workAddress: input.type === "Business" ? input.workAddress : undefined,
+          placeId: input.placeId,
+          location: input.location,
+          workPlaceId: input.type === "Business" ? input.workPlaceId : undefined,
+          workLocation: input.type === "Business" ? input.workLocation : undefined,
           image: fallbackImages[Math.floor(Math.random() * fallbackImages.length)],
           category: "upcoming",
           checklist: buildChecklist(input.type),
