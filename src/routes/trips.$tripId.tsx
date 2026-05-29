@@ -16,6 +16,7 @@ import { Navbar } from "@/components/Navbar";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useTrips } from "@/lib/trips-store";
 import { getQuickLinks, getGettingAround, type TransportOption } from "@/lib/trip-helpers";
+import { DestinationMap } from "@/components/DestinationMap";
 
 export const Route = createFileRoute("/trips/$tripId")({
   head: () => ({
@@ -178,6 +179,28 @@ function TripDetail() {
             ))}
           </div>
         </section>
+
+        {trip.location && (
+          <section className="mt-6 rounded-3xl bg-card p-5 shadow-[var(--shadow-soft)] sm:p-6">
+            <div className="mb-3 flex items-center gap-2">
+              <MapPin className="h-5 w-5 text-primary" />
+              <h2 className="text-xl font-extrabold text-foreground">On the map</h2>
+            </div>
+            <DestinationMap location={trip.location} label={trip.destination} />
+            {trip.type === "Business" && trip.workLocation && (
+              <div className="mt-4">
+                <p className="mb-2 text-sm font-semibold text-muted-foreground">
+                  Work location
+                </p>
+                <DestinationMap
+                  location={trip.workLocation}
+                  label={trip.workAddress}
+                  zoom={14}
+                />
+              </div>
+            )}
+          </section>
+        )}
       </main>
     </div>
   );
